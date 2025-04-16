@@ -179,3 +179,10 @@ document.getElementById('surpriseBtn').addEventListener('click', () => {
     }
   }, 1000);
 });
+
+
+// Show the button after 20 seconds of fireworks
+setTimeout(() => {
+  const btn = document.getElementById('surpriseBtn');
+  if (btn) btn.style.display = 'block';
+}, 20000);

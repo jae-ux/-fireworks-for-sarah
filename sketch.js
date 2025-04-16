@@ -3,11 +3,13 @@ let fireworks = [];
 let gravity;
 let started = false;
 let explosionSound;
+let loveTrack;
+let surpriseTriggered = false;
 
 function preload() {
   soundFormats('mp3');
-  whistleSound = loadSound('firework-whistle.mp3');
-  explosionSound = loadSound('firework-explosion.mp3');
+  explosionSound = loadSound('firework-explosion.mp3', () => {}, () => {});
+  loveTrack = loadSound('careless-whisper.mp3', () => {}, () => {});
 }
 
 function setup() {
@@ -18,21 +20,13 @@ function setup() {
 }
 
 function draw() {
-  if (!started) {
-    background(0);
-    fill(255);
-    textSize(28);
-    textAlign(CENTER, CENTER);
-    text('Tap anywhere to start the show 🎇', width / 2, height / 2);
-    return;
-  }
+  if (!started) return;
 
   colorMode(RGB);
   background(0, 0, 0, 30);
 
   if (random(1) < 0.025) {
     fireworks.push(new Firework());
-    whistleSound.play();
   }
 
   for (let i = fireworks.length - 1; i >= 0; i--) {
@@ -52,12 +46,37 @@ function draw() {
 function touchStarted() {
   started = true;
   userStartAudio();
+
+  // Start 20 second timer for the button reveal
+  setTimeout(() => {
+    const btn = document.getElementById('surpriseBtn');
+    if (btn) btn.style.display = 'block';
+  }, 20000);
+
   return false;
 }
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById('surpriseBtn');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      surpriseTriggered = true;
+      document.getElementById('message').classList.add('show');
+      if (loveTrack && loveTrack.isLoaded()) {
+        loveTrack.play();
+      }
+      setTimeout(() => {
+        for (let i = 0; i < 5; i++) {
+          fireworks.push(new Firework(true));
+        }
+      }, 1000);
+    });
+  }
+});
 
 class Firework {
   constructor() {
@@ -78,7 +97,9 @@ class Firework {
       if (this.firework.vel.y >= random(-2, 0)) {
         this.exploded = true;
         this.explode();
-        explosionSound.play();
+        if (explosionSound && explosionSound.isLoaded()) {
+          explosionSound.play();
+        }
       }
     }
 
@@ -97,7 +118,8 @@ class Firework {
       const angle = map(i, 0, num, 0, TWO_PI);
       const mag = random(3, 7);
       const vel = p5.Vector.fromAngle(angle).mult(mag);
-      const p = new Particle(this.firework.pos.x, this.firework.pos.y, this.hu + random(-15, 15), false, vel);
+      const hueShift = surpriseTriggered ? 300 : 0;
+      const p = new Particle(this.firework.pos.x, this.firework.pos.y, (this.hu + hueShift) % 360, false, vel);
       this.particles.push(p);
     }
   }
@@ -157,32 +179,3 @@ class Particle {
     }
   }
 }
-
-
-let loveTrack;
-
-function preload() {
-  soundFormats('mp3');
-  explosionSound = loadSound('firework-explosion.mp3', () => {}, () => {});
-  loveTrack = loadSound('careless-whisper.mp3');
-}
-
-document.getElementById('surpriseBtn').addEventListener('click', () => {
-  surpriseTriggered = true;
-  document.getElementById('message').classList.add('show');
-  if (loveTrack && loveTrack.isLoaded()) {
-    loveTrack.play();
-  }
-  setTimeout(() => {
-    for (let i = 0; i < 5; i++) {
-      fireworks.push(new Firework(true));
-    }
-  }, 1000);
-});
-
-
-// Show the button after 20 seconds of fireworks
-setTimeout(() => {
-  const btn = document.getElementById('surpriseBtn');
-  if (btn) btn.style.display = 'block';
-}, 20000);

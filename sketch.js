@@ -13,6 +13,7 @@ function preload() {
 }
 
 function setup() {
+  started = true;
   createCanvas(windowWidth, windowHeight);
   colorMode(HSB);
   gravity = createVector(0, 0.13);
@@ -20,8 +21,7 @@ function setup() {
 }
 
 function draw() {
-  if (!started) return;
-
+  
   colorMode(RGB);
   background(0, 0, 0, 30);
 
@@ -44,7 +44,6 @@ function draw() {
 }
 
 function touchStarted() {
-  started = true;
   userStartAudio();
 
   // Start 20 second timer for the button reveal
@@ -142,7 +141,7 @@ class Particle {
     if (firework) {
       this.vel = createVector(0, random(-13, -10));
     } else {
-      this.vel = vel || p5.Vector.random2D().mult(random(2, 6));
+      this.vel = vel || p5.Vector.random2D().mult(random(3, 8));
       this.drag = random(0.91, 0.95);
     }
   }
@@ -168,14 +167,14 @@ class Particle {
 
   show() {
     colorMode(HSB);
-    strokeWeight(this.firework ? 2 : 1);
+    strokeWeight(this.firework ? 1.5 : 0.8);
     stroke(this.hu, 100, 255, this.lifespan);
     line(this.prevPos.x, this.prevPos.y, this.pos.x, this.pos.y);
 
     if (!this.firework) {
       noStroke();
       fill(this.hu, 100, 255, this.lifespan / 5);
-      ellipse(this.pos.x, this.pos.y, 4);
+      ellipse(this.pos.x, this.pos.y, 6);
     }
   }
 }

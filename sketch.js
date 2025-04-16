@@ -2,7 +2,7 @@
 let fireworks = [];
 let gravity;
 let started = false;
-let whistleSound, explosionSound;
+let explosionSound;
 
 function preload() {
   soundFormats('mp3');
@@ -157,3 +157,25 @@ class Particle {
     }
   }
 }
+
+
+let loveTrack;
+
+function preload() {
+  soundFormats('mp3');
+  explosionSound = loadSound('firework-explosion.mp3', () => {}, () => {});
+  loveTrack = loadSound('careless-whisper.mp3');
+}
+
+document.getElementById('surpriseBtn').addEventListener('click', () => {
+  surpriseTriggered = true;
+  document.getElementById('message').classList.add('show');
+  if (loveTrack && loveTrack.isLoaded()) {
+    loveTrack.play();
+  }
+  setTimeout(() => {
+    for (let i = 0; i < 5; i++) {
+      fireworks.push(new Firework(true));
+    }
+  }, 1000);
+});

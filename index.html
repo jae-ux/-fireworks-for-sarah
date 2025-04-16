@@ -14,13 +14,44 @@
       overflow: hidden;
       touch-action: none;
       user-select: none;
-      -webkit-user-select: none;
       background: black;
     }
     canvas {
       display: block;
     }
+    #surpriseBtn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      background: #ff69b4;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #ff69b4;
+      z-index: 10;
+    }
+    #message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 32px;
+      font-family: 'Courier New', monospace;
+      opacity: 0;
+      transition: opacity 1s ease;
+      z-index: 9;
+    }
+    #message.show {
+      opacity: 1;
+    }
   </style>
 </head>
-<body></body>
+<body>
+  <button id="surpriseBtn">One more surprise...</button>
+  <div id="message">You’re brighter than all these fireworks, Sarah 💖</div>
+</body>
 </html>

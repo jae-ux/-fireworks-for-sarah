@@ -2,9 +2,11 @@
 let fireworks = [];
 let gravity;
 let fireworkSound;
+let fft;
 let started = false;
 
 function preload() {
+  soundFormats('mp3');
   fireworkSound = loadSound('fiery-whistle-firework-missile-explodes-in-the-night-sky-258872.mp3');
 }
 
@@ -15,19 +17,21 @@ function setup() {
   textFont('Courier New');
   textSize(36);
   textAlign(CENTER, CENTER);
+  fft = new p5.FFT();
+  background(0);
 }
 
 function draw() {
   if (!started) {
     background(0);
     fill(255);
-    text('Tap to Start Fireworks', width / 2, height / 2);
+    text('Tap anywhere to start the show 🎇', width / 2, height / 2);
     return;
   }
 
   background(0, 0, 0, 25);
 
-  if (random(1) < 0.03) {
+  if (random(1) < 0.02) {
     fireworks.push(new Firework());
   }
 
@@ -45,8 +49,9 @@ function draw() {
 
 function touchStarted() {
   if (!started) {
-    started = true;
     userStartAudio();
+    started = true;
+    fireworkSound.loop();
   }
 }
 
@@ -56,7 +61,6 @@ class Firework {
     this.firework = new Particle(random(width), height, this.hu, true);
     this.exploded = false;
     this.particles = [];
-    fireworkSound.play(); // launch sound
   }
 
   done() {
@@ -83,11 +87,14 @@ class Firework {
   }
 
   explode() {
-    for (let i = 0; i < 100; i++) {
+    let spectrum = fft.analyze();
+    let energy = fft.getEnergy("bass");
+    let count = map(energy, 0, 255, 30, 120);
+
+    for (let i = 0; i < count; i++) {
       const p = new Particle(this.firework.pos.x, this.firework.pos.y, this.hu, false);
       this.particles.push(p);
     }
-    fireworkSound.play(); // explosion sound
   }
 
   show() {
@@ -95,8 +102,8 @@ class Firework {
       this.firework.show();
     }
 
-    for (let i = 0; i < this.particles.length; i++) {
-      this.particles[i].show();
+    for (let p of this.particles) {
+      p.show();
     }
   }
 }
@@ -104,13 +111,14 @@ class Firework {
 class Particle {
   constructor(x, y, hu, firework) {
     this.pos = createVector(x, y);
+    this.prevPos = this.pos.copy();
     this.firework = firework;
     this.lifespan = 255;
     this.hu = hu;
     this.acc = createVector(0, 0);
 
     if (this.firework) {
-      this.vel = createVector(0, random(-12, -8));
+      this.vel = createVector(0, random(-6, -3)); // slower ascent
     } else {
       this.vel = p5.Vector.random2D();
       this.vel.mult(random(2, 10));
@@ -122,6 +130,8 @@ class Particle {
   }
 
   update() {
+    this.prevPos = this.pos.copy();
+
     if (!this.firework) {
       this.vel.mult(0.9);
       this.lifespan -= 4;
@@ -138,8 +148,14 @@ class Particle {
 
   show() {
     colorMode(HSB);
-    strokeWeight(this.firework ? 4 : 2);
-    stroke(this.hu, 255, 255, this.lifespan);
-    point(this.pos.x, this.pos.y);
+    strokeWeight(2);
+    let glow = color(this.hu, 255, 255, this.lifespan);
+    stroke(glow);
+    line(this.prevPos.x, this.prevPos.y, this.pos.x, this.pos.y);
+
+    // Soft bloom glow
+    noStroke();
+    fill(this.hu, 255, 255, this.lifespan / 4);
+    ellipse(this.pos.x, this.pos.y, 12);
   }
 }

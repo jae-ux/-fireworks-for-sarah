@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Fireworks for Sarah</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
@@ -13,14 +13,20 @@
       padding: 0;
       overflow: hidden;
       touch-action: none;
-      user-select: none;
       background: black;
+      height: 100%;
+      width: 100%;
     }
+
     canvas {
       display: block;
-    }
-    #surpriseBtn {
       position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    #surpriseBtn {
+      position: fixed;
       bottom: 20px;
       right: 20px;
       padding: 12px 20px;
@@ -34,18 +40,22 @@
       z-index: 10;
       display: none;
     }
+
     #message {
-      position: absolute;
+      position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       color: #fff;
-      font-size: 32px;
+      font-size: 28px;
       font-family: 'Courier New', monospace;
       opacity: 0;
       transition: opacity 1s ease;
       z-index: 9;
+      text-align: center;
+      padding: 0 10px;
     }
+
     #message.show {
       opacity: 1;
     }

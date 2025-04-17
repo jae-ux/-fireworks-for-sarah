@@ -13,6 +13,7 @@ function preload() {
 }
 
 function setup() {
+  moonX = width - 100; moonY = 100;
   started = true;
   createCanvas(windowWidth, windowHeight);
   colorMode(HSB);
@@ -21,6 +22,10 @@ function setup() {
 }
 
 function draw() {
+  drawMoon();
+  drawCityGlow();
+  drawFireGlow();
+
   
   colorMode(RGB);
   background(0, 0, 0, 30);
@@ -141,7 +146,7 @@ class Particle {
     if (firework) {
       this.vel = createVector(0, random(-13, -10));
     } else {
-      this.vel = vel || p5.Vector.random2D().mult(random(3, 8));
+      this.vel = vel || p5.Vector.random2D().mult(random(2, 9));
       this.drag = random(0.91, 0.95);
     }
   }
@@ -154,7 +159,8 @@ class Particle {
     this.prevPos = this.pos.copy();
     if (!this.firework) {
       this.vel.mult(this.drag);
-      this.lifespan -= map(this.vel.mag(), 0, 5, 0.5, 1.5);
+      this.vel.add(p5.Vector.random2D().mult(0.05));
+      this.lifespan -= map(this.vel.mag(), 0, 7, 0.25, 1.2);
     }
     this.vel.add(this.acc);
     this.pos.add(this.vel);
@@ -170,6 +176,11 @@ class Particle {
     strokeWeight(this.firework ? 1.5 : 0.8);
     stroke(this.hu, 100, 255, this.lifespan);
     line(this.prevPos.x, this.prevPos.y, this.pos.x, this.pos.y);
+    if (!this.firework) {
+      noStroke();
+      fill(this.hu, 100, 255, this.lifespan / 6);
+      ellipse(this.pos.x, this.pos.y, 10 + random(-1, 2));
+    }
 
     if (!this.firework) {
       noStroke();
@@ -177,4 +188,42 @@ class Particle {
       ellipse(this.pos.x, this.pos.y, 6);
     }
   }
+}
+
+let moonX, moonY;
+
+function drawMoon() {
+  noStroke();
+  fill(60, 10, 255);
+  ellipse(moonX, moonY, 100);
+}
+
+function drawCityGlow() {
+  let baseY = height - 100;
+  fill(0, 0, 20);
+  rect(0, baseY, width, 100);
+
+  for (let x = 0; x < width; x += 40) {
+    let h = random(50, 90);
+    fill(0, 0, 30 + random(20));
+    rect(x, baseY - h, 30, h);
+  }
+}
+
+function drawFireGlow() {
+  drawingContext.globalCompositeOperation = 'lighter';
+  for (let f of fireworks) {
+    if (f.exploded) {
+      for (let p of f.particles) {
+        let d = dist(p.pos.x, p.pos.y, width / 2, height - 80);
+        let glow = max(0, 150 - d);
+        if (glow > 0) {
+          noStroke();
+          fill(p.hu, 100, 255, glow / 8);
+          ellipse(width / 2, height - 80, glow);
+        }
+      }
+    }
+  }
+  drawingContext.globalCompositeOperation = 'source-over';
 }

@@ -26,9 +26,6 @@
     }
 
     #surpriseBtn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
       padding: 12px 20px;
       background: #ff69b4;
       border: none;
@@ -37,8 +34,10 @@
       font-size: 16px;
       cursor: pointer;
       box-shadow: 0 0 10px #ff69b4;
-      z-index: 10;
+      z-index: 9999;
       display: none;
+      opacity: 0;
+      transition: opacity 1.5s ease;
     }
 
     #message {
@@ -51,7 +50,7 @@
       font-family: 'Courier New', monospace;
       opacity: 0;
       transition: opacity 1s ease;
-      z-index: 9;
+      z-index: 9999;
       text-align: center;
       padding: 0 10px;
     }
@@ -64,5 +63,32 @@
 <body>
   <button id="surpriseBtn">One more surprise...</button>
   <div id="message">You’re brighter than all these fireworks, Sarah 💖</div>
+
+  <script>
+    function isMobile() {
+      return /iPhone|iPad|iPod|Android|webOS/i.test(navigator.userAgent);
+    }
+
+    function showSurpriseButton() {
+      const btn = document.getElementById('surpriseBtn');
+      if (!btn) return;
+      btn.style.display = 'block';
+      if (isMobile()) {
+        btn.style.position = 'fixed';
+        btn.style.top = '50%';
+        btn.style.left = '50%';
+        btn.style.transform = 'translate(-50%, -50%)';
+      } else {
+        btn.style.position = 'fixed';
+        btn.style.bottom = '20px';
+        btn.style.right = '20px';
+      }
+      setTimeout(() => {
+        btn.style.opacity = 1;
+      }, 50); // allow display to apply before fade
+    }
+
+    window.showSurpriseButton = showSurpriseButton;
+  </script>
 </body>
 </html>
